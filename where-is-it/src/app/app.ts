@@ -1,14 +1,21 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { from, interval, Subscription } from 'rxjs';
 import {ApiService} from '../../api.service';
 import { UserItem } from './user_item';
-import { HttpTestingController } from '@angular/common/http/testing';
+import { ItemCardComponent } from './item-card.component';
+
+// TO-DO
+// - Implement login system
+// - Implement loading indicator
+// - Add error handling for fetch requests
+// - Style the app with CSS
+// - Add functionality to delete items
+// - Add functionality to update item locations
 
 @Component({
   selector: 'app-root',
-  imports: [UserItem],
+  imports: [UserItem, ItemCardComponent],
   template: `
     <section>
       <h1 id="logo">Where Is It?</h1>
@@ -20,13 +27,15 @@ import { HttpTestingController } from '@angular/common/http/testing';
       (e.g., "On the kitchen table") to add it to the database.</p>
     </section>
     <section>
-      <h2>Tracked Items:</h2>
+      <h2 id="tracked-items">Tracked Items:</h2>
       @if (isLoading()) {
         <p>Loading items...</p>
       } @else {
-        @for (item of emailArray(); track item.name) {
-          <app-user-item name="{{item.name}}" location="{{item.location}}"/>
-        }
+        <div id="item-card-grid">
+          @for (item of emailArray(); track item.name) {
+            <app-item-card name="{{item.name}}" location="{{item.location}}"/>
+          }
+        </div>
       }
     </section>
 `,

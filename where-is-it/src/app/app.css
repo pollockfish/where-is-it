@@ -26,5 +26,19 @@
     background-color: #dff0ff;
     padding: 15px;
     border-radius: 10px;
-    border: 1px solid #124177;
+    border: px solid #124177;
+}
+
+#tracked-items {
+    font-family: 'Lobster', cursive;
+    color: #124177;
+    font-size: 2lh;
+    margin-left: 16px;
+}
+
+#item-card-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  padding: 16px;
+
 }

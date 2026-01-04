@@ -30,15 +30,20 @@ const imapConfig = {
 
 const imap = new Imap(imapConfig);
 
-const connection = mysql.createConnection({
-  host: "where-is-it.cja6qys804n1.us-east-2.rds.amazonaws.com",
-  port: 3306,
-  user: "admin",
-  password: process.env.SQL_PASSWORD,
-  database: "where_is_it",
-});
+function checkForNewEmails() {
+  imap.connect();
+}
 
-connection.connect((err) => {
+app.get("/api/get-stored-emails", (req, res) => {
+  const connection = mysql.createConnection({
+    host: "where-is-it.cja6qys804n1.us-east-2.rds.amazonaws.com",
+    port: 3306,
+    user: "admin",
+    password: process.env.SQL_PASSWORD,
+    database: "where_is_it",
+  });
+
+  connection.connect((err) => {
   if (err) {
     console.error("Database connection failed: " + err.stack);
     return;
@@ -46,11 +51,6 @@ connection.connect((err) => {
   console.log("Connected to the database");
 });
 
-function checkForNewEmails() {
-  imap.connect();
-}
-
-app.get("/api/get-stored-emails", (req, res) => {
   const query = "SELECT * FROM emails";
   connection.query(query, (err, results) => {
     if (err) {

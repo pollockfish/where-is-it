@@ -1,0 +1,25 @@
+:host {
+    display: block;
+    border: 3px solid #000000;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 8px 0;
+    background-color: #f9f9f9;
+    width: 200px;
+    height: 200px;
+}
+
+#item-card-name{
+    font-family: "Just Another Hand", cursive;
+    font-weight: bold;
+    font-variant: small-caps;
+    font-size: 2lh;
+    color: #124177;
+}
+
+#item-card-location{
+    font-family: monospace;
+    font-weight: 500;
+    font-size: 1.2lh;
+    color: #2f81c9;
+}
