@@ -1,7 +1,18 @@
+// Where Is It? - Mail Server
+// server.js
+// This server connects to a Gmail account via IMAP, checks for new emails,
+// stores them in a MySQL database, and provides an API endpoint to retrieve stored emails.
+
+// API_PASSWORD=$API_PASSWORD SQL_PASSWORD=$SQL_PASSWORD node server.js
+
+
 const express = require("express");
 const mysql = require("mysql2");
 const app = express();
 const PORT = 3000;
+const cors = require('cors');
+
+app.use(cors({ origin: 'http://127.0.0.1:4200' }));
 
 const Imap = require("imap");
 const {simpleParser} = require("mailparser");
@@ -33,6 +44,21 @@ connection.connect((err) => {
     return;
   }
   console.log("Connected to the database");
+});
+
+function checkForNewEmails() {
+  imap.connect();
+}
+
+app.get("/api/get-stored-emails", (req, res) => {
+  const query = "SELECT * FROM emails";
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching emails from database:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.json(results);
+  });
 });
 
 imap.once("ready", () => {
@@ -78,8 +104,6 @@ imap.once("end", () => {
   console.log("IMAP connection ended");
 });
 
-imap.connect();
-
 function insertEmailIntoDB(emailData) {
   const { subject, text } = emailData;
   const from = emailData.from.text;
@@ -99,23 +123,7 @@ function insertEmailIntoDB(emailData) {
   });
 }
 
-// app.post("/api/emails", (req, res) => {
-//   const { sender, subject, body } = req.body;
-
-//   if (!sender || !subject || !body) {
-//     return res.status(400).send("Missing required email fields.");
-//   }
-
-//   const query = "INSERT INTO emails (sender, subject, body) VALUES (?, ?, ?)";
-//   connection.query(query, [sender, subject, body], (err, result) => {
-//     if (err) {
-//       console.error("Error inserting email into database:", err);
-//       return res.status(500).send("Error saving email.");
-//     }
-//     console.log("Email inserted:", result.insertId);
-//     res.status(201).send(`Email with ID: ${result.insertId} saved.`);
-//   });
-// });
+checkForNewEmails();
 
 // Start the server
 app.listen(PORT, () => {
