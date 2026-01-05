@@ -8,8 +8,8 @@ import { FormsModule } from '@angular/forms';
     imports: [FormsModule],
     template: `
     <section id="login-form">
-        <h2 id="login-title">Welcome Back! Missing Something?</h2>
         <form (submit)="onLogin()">
+            <h2 id="login-title">Welcome Back! Missing Something?</h2>
             <label for="email">Please enter your email</label>
             <br/>
             <input type="email" id="email" [(ngModel)]="userEmail" name="email" required />

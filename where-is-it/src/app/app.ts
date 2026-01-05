@@ -17,7 +17,7 @@ import { LoginComponent } from './login.component';
 
 @Component({
   selector: 'app-root',
-  imports: [UserItem, ItemCardComponent, LoginComponent],
+  imports: [ItemCardComponent, LoginComponent],
   template: `
     <section>
       <h1 id="logo">Where Is It?</h1>

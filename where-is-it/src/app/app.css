@@ -16,7 +16,7 @@ button {
 #logo {
     font-family: 'Fontdiner Swanky', sans-serif;
     color: #124177;
-    font-size: 3lh;
+    font-size: 72px;
     text-align: center;
     margin-top: 20px;
     margin-bottom: 0px;
@@ -33,7 +33,7 @@ button {
 
 #instructions {
     font-family: monospace;
-    width: 40lh;
+    width: 60%;
     color: #3c3c3c;
     font-size: 1lh;
     text-align: center;

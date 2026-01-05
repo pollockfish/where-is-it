@@ -1,6 +1,12 @@
-:host {
+section {
     font-family: monospace;
     display: flex;
     justify-content: center;
-    ;
+}
+
+#login-title {
+    font-family: 'Lobster', cursive;
+    color: #124177;
+    font-size: 1.4lh;
+    letter-spacing: 0.05lh;
 }
