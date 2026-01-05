@@ -1,9 +1,11 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient, httpResource } from '@angular/common/http';
+
 import {ApiService} from '../../api.service';
 import { UserItem } from './user_item';
 import { ItemCardComponent } from './item-card.component';
+import { LoginComponent } from './login.component';
 
 // TO-DO
 // - Implement login system
@@ -15,7 +17,7 @@ import { ItemCardComponent } from './item-card.component';
 
 @Component({
   selector: 'app-root',
-  imports: [UserItem, ItemCardComponent],
+  imports: [UserItem, ItemCardComponent, LoginComponent],
   template: `
     <section>
       <h1 id="logo">Where Is It?</h1>
@@ -25,6 +27,9 @@ import { ItemCardComponent } from './item-card.component';
       <p id="instructions">Send an email to <a href="mailto:whereisitserver@gmail.com">whereisitserver@gmail.com</a> 
       with the subject as the name of the item (e.g., "Keys") and the body as the last known location of the item
       (e.g., "On the kitchen table") to add it to the database.</p>
+    </section>
+    <section>
+      <app-login></app-login>
     </section>
     <section>
       <h2 id="tracked-items">Tracked Items:</h2>
