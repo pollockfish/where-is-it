@@ -12,7 +12,7 @@ const app = express();
 const PORT = 3000;
 const cors = require('cors');
 
-app.use(cors({ origin: 'http://127.0.0.1:4200' }));
+app.use(cors({ origin: ['http://127.0.0.1:4200', /\app.github\.dev$/]}));
 
 const Imap = require("imap");
 const {simpleParser} = require("mailparser");
