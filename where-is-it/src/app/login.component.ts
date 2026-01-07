@@ -1,5 +1,6 @@
-import { Component, input, signal } from "@angular/core";
+import { Component, EventEmitter, input, signal, Output } from "@angular/core";
 import { FormsModule } from '@angular/forms';
+import { ApiService } from "../../api.service";
 
 @Component({
     standalone: true,
@@ -14,26 +15,29 @@ import { FormsModule } from '@angular/forms';
             <br/>
             <input type="email" id="email" [(ngModel)]="userEmail" name="email" required />
             <br/>
-            <label for="password">And your password <small>(if you remember where you wrote it down)</small></label>
-            <br/>
-            <input type="password" id="password" [(ngModel)]="password" name="password" required />
-            <br/>
-            <button type="button" (click)="buttonPressed.set(!buttonPressed())">Login</button>
+            <button type="button" (click)="onLogin()">Login</button>
         </form>
     </section>
     `
 })
 
 export class LoginComponent {
-    readonly userEmail = '';
-    readonly password = '';
+    @Output() valueChange = new EventEmitter<string>(); 
 
-    buttonPressed = signal(false);
+    readonly userEmail = '';
 
     constructor() {
     }
 
+
     onLogin(): void {
-        console.log(`Logging in with username: ${this.userEmail} and password: ${this.password}`);
+        console.log(`Logging in with username: ${this.userEmail}`);
+        if(this.userEmail.trim() === '') {
+            console.warn('Email address is required.');
+            return;
+        } else {
+            this.valueChange.emit(this.userEmail);
+        }
+        
     }
 }

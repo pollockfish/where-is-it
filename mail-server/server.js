@@ -19,6 +19,18 @@ const {simpleParser} = require("mailparser");
 
 app.use(express.json());
 
+// Create a reusable database connection pool
+const pool = mysql.createPool({
+  host: "where-is-it.cja6qys804n1.us-east-2.rds.amazonaws.com",
+  port: 3306,
+  user: "admin",
+  password: process.env.SQL_PASSWORD,
+  database: "where_is_it",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
 const imapConfig = {
   user: "whereisitserver@gmail.com",
   password: process.env.APP_PASSWORD,      // Google requires you to generate an 'app password'
@@ -35,28 +47,46 @@ function checkForNewEmails() {
 }
 
 app.get("/api/get-stored-emails", (req, res) => {
-  const connection = mysql.createConnection({
-    host: "where-is-it.cja6qys804n1.us-east-2.rds.amazonaws.com",
-    port: 3306,
-    user: "admin",
-    password: process.env.SQL_PASSWORD,
-    database: "where_is_it",
-  });
-
-  connection.connect((err) => {
-  if (err) {
-    console.error("Database connection failed: " + err.stack);
-    return;
-  }
-  console.log("Connected to the database");
-});
+  checkForNewEmails();
 
   const query = "SELECT * FROM emails";
-  connection.query(query, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
       console.error("Error fetching emails from database:", err);
       return res.status(500).send("Internal Server Error");
     }
+    res.json(results);
+  });
+});
+
+app.post("/api/get-stored-emails", (req, res) => {
+  checkForNewEmails();
+
+  const query = "SELECT * FROM emails";
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching emails from database:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.json(results);
+  });
+});
+
+app.post("/api/get-emails-by-sender", async (req, res) => {
+  checkForNewEmails();
+
+  const sender = req.body.sender;
+
+  console.log(sender);
+
+  const query = "SELECT * FROM `emails` WHERE `sender` = ?";
+  pool.query(query, [sender], (err, results) => {
+    if (err) {
+      console.error("Error fetching emails from database:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    if (results.length === 0) results = [{id: 0, sender: sender, subject: "No emails found", text: "No emails found from this sender."}];
+    console.log(results);
     res.json(results);
   });
 });
@@ -105,21 +135,27 @@ imap.once("end", () => {
 });
 
 function insertEmailIntoDB(emailData) {
+  // FIX SENDER
   const { subject, text } = emailData;
-  const from = emailData.from.text;
+  var from = emailData.from.text;
+
+  const regex = /<([^>]*)>/g;
+  from = [...from.matchAll(regex)].map(match => match[1]);
 
   if (!from || !subject || !text ) {
     console.error("Missing required email fields.");
+    return;
   }
 
   const query = "INSERT INTO emails (`sender`, `subject`, `text`) VALUES (?, ?, ?)";
   // "from" is replaced with "sender" when inserting into table becase "from"
   // is a reserved word in SQL and it would just cause confusion to name a value that
-  connection.query(query, [from, subject, text], (err, result) => {
+  pool.query(query, [from, subject, text], (err, result) => {
     if (err) {
       console.error("Error inserting email into database:", err);
+    } else {
+      console.log("Email inserted:", result.insertId);
     }
-    console.log("Email inserted:", result.insertId);
   });
 }
 

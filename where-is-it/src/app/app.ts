@@ -28,29 +28,35 @@ import { LoginComponent } from './login.component';
       with the subject as the name of the item (e.g., "Keys") and the body as the last known location of the item
       (e.g., "On the kitchen table") to add it to the database.</p>
     </section>
+    @if (!loggedIn()) {
     <section>
-      <app-login></app-login>
+      <app-login (valueChange)="receiveEmailAddress($event)"></app-login>
     </section>
-    <section>
-      <h2 id="tracked-items">Tracked Items:</h2>
-      @if (isLoading()) {
-        <p>Loading items...</p>
-      } @else {
-        <div id="item-card-grid">
-          @for (item of emailArray(); track item.name) {
-            <app-item-card name="{{item.name}}" location="{{item.location}}"/>
-          }
-        </div>
-      }
-    </section>
+    } @else {
+      <section>
+        <h2 id="tracked-items">Tracked Items:</h2>
+        @if (isLoading()) {
+          <p>Loading items...</p>
+        } @else {
+            <div id="item-card-grid">
+              @for (item of emailArray(); track item.name) {
+                <app-item-card name="{{item.name}}" location="{{item.location}}"/>
+              }
+            </div>
+        }
+      </section>
+   }
 `,
   styleUrl: './app.css'
 })
 
 export class App implements OnInit {
 
+  userEmail = '';
+
   emailArray = signal<UserItem[]>([]);
   isLoading = signal(true);
+  loggedIn = signal(false);
   
   constructor() {}
 
@@ -58,11 +64,36 @@ export class App implements OnInit {
     this.getEmails();
   }
 
+  receiveEmailAddress(emailEvent: any): void {
+    this.userEmail = emailEvent;
+    console.log(`Received email address: ${this.userEmail}`);
+    this.getEmailsBySender(this.userEmail);
+  };
+
   async getEmails(): Promise<void> {
     try {
       const response = await ApiService.getEmails();
       console.log('Data from port 3000:', response);
       this.addEmailsToArray(response);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async getEmailsBySender(sender: string): Promise<void> {
+    try {
+      await ApiService.getEmailsBySender(this.userEmail).then((emails) => {
+            console.log('Fetched emails:', emails);
+            // Here you would typically update some shared state or service
+            // to indicate that the user is logged in and store the fetched emails.
+            this.addEmailsToArray(emails);
+            this.loggedIn.set(true);
+        }).catch((error) => {
+            console.error('Error during login:', error);
+        });
+
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
