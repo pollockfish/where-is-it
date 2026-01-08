@@ -38,10 +38,12 @@ import { LoginComponent } from './login.component';
         @if (isLoading()) {
           <p>Loading items...</p>
         } @else {
-            <div id="item-card-grid">
-              @for (item of emailArray(); track item.name) {
-                <app-item-card name="{{item.name}}" location="{{item.location}}"/>
-              }
+            <div>
+              <table id="item-card-grid">
+                @for (item of emailArray(); track item.name) {
+                  <app-item-card name="{{item.name}}" location="{{item.location}}"/>
+                }
+              </table>
             </div>
         }
       </section>

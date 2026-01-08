@@ -43,7 +43,49 @@ const imapConfig = {
 const imap = new Imap(imapConfig);
 
 function checkForNewEmails() {
-  imap.connect();
+  imap.once("ready", () => {
+  imap.openBox("INBOX", false, (err, box) => {
+    if (err) throw err;
+    // Search for unseen emails since a certain date
+    imap.search(["UNSEEN"], (err, results) => {
+      if (err) throw err;
+      if (results.length > 0) {
+        const fetch = imap.fetch(results, { bodies: "", markSeen: true });
+        fetch.on("message", (msg, seqno) => {
+          msg.on("body", (stream, info) => {
+            simpleParser(stream, (err, parsed) => {
+              if (err) throw err;
+              console.log(parsed);
+              insertEmailIntoDB(parsed);
+            });
+          });
+          msg.once("end", () => {
+            console.log("Finished with message #%d", seqno);
+          });
+        });
+        fetch.once("error", (err) => {
+          console.log("Fetch error: " + err);
+        });
+        fetch.once("end", () => {
+          console.log("Done fetching all messages!");
+          imap.end();
+        });
+      } else {
+        console.log("No new emails found.");
+        imap.end();
+      }
+    });
+  });
+});
+
+imap.once("error", (err) => {
+  console.log(err);
+});
+
+imap.once("end", () => {
+  console.log("IMAP connection ended");
+});
+imap.connect();
 }
 
 app.get("/api/get-stored-emails", (req, res) => {
@@ -91,51 +133,9 @@ app.post("/api/get-emails-by-sender", async (req, res) => {
   });
 });
 
-imap.once("ready", () => {
-  imap.openBox("INBOX", false, (err, box) => {
-    if (err) throw err;
-    // Search for unseen emails since a certain date
-    imap.search(["UNSEEN"], (err, results) => {
-      if (err) throw err;
-      if (results.length > 0) {
-        const fetch = imap.fetch(results, { bodies: "", markSeen: true });
-        fetch.on("message", (msg, seqno) => {
-          msg.on("body", (stream, info) => {
-            simpleParser(stream, (err, parsed) => {
-              if (err) throw err;
-              console.log(parsed);
-              insertEmailIntoDB(parsed);
-            });
-          });
-          msg.once("end", () => {
-            console.log("Finished with message #%d", seqno);
-          });
-        });
-        fetch.once("error", (err) => {
-          console.log("Fetch error: " + err);
-        });
-        fetch.once("end", () => {
-          console.log("Done fetching all messages!");
-          imap.end();
-        });
-      } else {
-        console.log("No new emails found.");
-        imap.end();
-      }
-    });
-  });
-});
-
-imap.once("error", (err) => {
-  console.log(err);
-});
-
-imap.once("end", () => {
-  console.log("IMAP connection ended");
-});
+// FIX IMAP
 
 function insertEmailIntoDB(emailData) {
-  // FIX SENDER
   const { subject, text } = emailData;
   var from = emailData.from.text;
 

@@ -1,25 +1,28 @@
 :host {
     display: block;
-    border: 3px solid #000000;
     border-radius: 8px;
     padding: 16px;
     margin: 8px 0;
-    background-color: #f9f9f9;
-    width: 200px;
-    height: 200px;
+    background-color: #ffffff;
+    max-width: 60%;
+    height: fit-content;
+    border-top: 0.5px solid #c4cbeb;
 }
 
 #item-card-name{
-    font-family: "Just Another Hand", cursive;
-    font-weight: bold;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 600;
     font-variant: small-caps;
-    font-size: 2lh;
+    font-size: 1lh;
     color: #124177;
+    width: 20%;
+    text-align: left;;
 }
 
 #item-card-location{
     font-family: monospace;
     font-weight: 500;
-    font-size: 1.2lh;
     color: #2f81c9;
+    font-size: 18px;
+    text-align: center;
 }

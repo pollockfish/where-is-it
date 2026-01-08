@@ -4,11 +4,11 @@ import {Component, input} from '@angular/core';
   selector: 'app-item-card',
   styleUrl: './item-card.component.css',
   template: `
-    <section id="item-card">
-        <div id="item-card-content">
-            <span id="item-card-name">{{name()}}</span>
-            <p id="item-card-location">{{location()}}</p>
-        </div>
+    <section>
+        <tr>
+          <th id="item-card-name">{{name()}}</th>
+          <td id="item-card-location">{{location()}}</td>
+        </tr>
     </section>
   `
 })
@@ -16,3 +16,7 @@ export class ItemCardComponent {
     readonly name = input<string>();
     readonly location = input<string>();
 }
+
+// id="item-card-content"
+//   "item-card-name"
+//   "item-card-location"

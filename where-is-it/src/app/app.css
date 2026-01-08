@@ -49,11 +49,16 @@ button {
     color: #124177;
     font-size: 2lh;
     margin-left: 16px;
+    margin-bottom: 0px;
 }
 
 #item-card-grid {
-  display: grid;
-  grid-template-columns: auto auto auto;
+  display: table;
   padding: 16px;
+}
 
+#item-card-grid :first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
 }
